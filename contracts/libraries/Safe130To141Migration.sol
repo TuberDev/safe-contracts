@@ -12,7 +12,9 @@ interface ISafe {
  * @title Migration Contract for Safe Upgrade
  * @notice This contract facilitates the migration of a Safe contract from version 1.3.0 to 1.4.1.
  *         The older versions should use built-in upgrade methods.
- * @dev IMPORTANT: The migration will only work with proxies that store the implementation address in the storage slot 0.
+ * @dev IMPORTANT: The library is intended to be used with the Safe standard proxy that stores the singleton address
+ *      at the storage slot 0. Use at your own risk with custom proxy implementations. The library will block calls
+ *      if the address stored at the storage slot 0 is not a contract.
  */
 contract Safe130To141Migration is SafeStorage {
     // Address of this contract
@@ -39,6 +41,15 @@ contract Safe130To141Migration is SafeStorage {
         require(isContract(SAFE_141_FALLBACK_HANDLER), "Safe 1.4.1 Fallback Handler is not deployed");
     }
 
+    function checkCurrentSingleton() internal view {
+        require(isContract(singleton), "Unsupported proxy contract");
+    }
+
+    modifier validSingletonOnly() {
+        checkCurrentSingleton();
+        _;
+    }
+
     /**
      * @notice Event indicating a change of master copy address.
      * @param singleton New master copy address
@@ -49,9 +60,7 @@ contract Safe130To141Migration is SafeStorage {
      * @notice Migrate to Safe 1.4.1 Singleton (L1) at `SAFE_141_SINGLETON`
      * @dev This function should only be called via a delegatecall to perform the upgrade.
      */
-    function migrate() public {
-        require(address(this) != MIGRATION_SINGLETON, "Migration should only be called via delegatecall");
-
+    function migrate() public validSingletonOnly {
         singleton = SAFE_141_SINGLETON;
 
         emit ChangedMasterCopy(singleton);
@@ -71,9 +80,7 @@ contract Safe130To141Migration is SafeStorage {
      * @notice Migrate to Safe 1.4.1 Singleton (L2) at `SAFE_141_SINGLETON_L2`
      * @dev This function should only be called via a delegatecall to perform the upgrade.
      */
-    function migrateL2() public {
-        require(address(this) != MIGRATION_SINGLETON, "Migration should only be called via delegatecall");
-
+    function migrateL2() public validSingletonOnly {
         singleton = SAFE_141_SINGLETON_L2;
 
         emit ChangedMasterCopy(singleton);
