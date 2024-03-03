@@ -4,13 +4,7 @@ pragma solidity >=0.7.0 <0.9.0;
 
 import {SafeStorage} from "../libraries/SafeStorage.sol";
 import {Guard} from "../base/GuardManager.sol";
-
-// Interface for interacting with the Safe contract
-interface ISafe {
-    function setFallbackHandler(address handler) external;
-
-    function setGuard(address guard) external;
-}
+import {ISafe} from "../interfaces/ISafe.sol";
 
 /**
  * @title Migration Contract for Safe Upgrade
@@ -33,7 +27,7 @@ contract Safe150Migration is SafeStorage {
     address public constant SAFE_150_FALLBACK_HANDLER = address(0x8aa755cB169991fEDC3E306751dCb71964A041c7);
 
     // the slot is defined as "keccak256("guard_manager.guard.address")" in the GuardManager contract
-    // reference: https://github.com/safe-global/safe-contracts/blob/8ffae95faa815acf86ec8b50021ebe9f96abde10/contracts/base/GuardManager.sol#L76-L77
+    // reference: https://github.com/safe-global/safe-smart-account/blob/8ffae95faa815acf86ec8b50021ebe9f96abde10/contracts/base/GuardManager.sol#L76-L77
     bytes32 internal constant GUARD_STORAGE_SLOT = 0x4a204f620c8c5ccdca3fd54d003badd85ba500436a431f0cbda4f558c93c34c8;
 
     /**
@@ -160,10 +154,12 @@ contract Safe150Migration is SafeStorage {
      */
     function getGuard() internal view returns (address guard) {
         bytes32 slot = GUARD_STORAGE_SLOT;
-        // solhint-disable-next-line no-inline-assembly
+        /* solhint-disable no-inline-assembly */
+        /// @solidity memory-safe-assembly
         assembly {
             guard := sload(slot)
         }
+        /* solhint-enable no-inline-assembly */
     }
 
     /**
@@ -176,10 +172,12 @@ contract Safe150Migration is SafeStorage {
      */
     function isContract(address account) internal view returns (bool) {
         uint256 size;
-        // solhint-disable-next-line no-inline-assembly
+        /* solhint-disable no-inline-assembly */
+        /// @solidity memory-safe-assembly
         assembly {
             size := extcodesize(account)
         }
+        /* solhint-enable no-inline-assembly */
 
         // If the code size is greater than 0, it is a contract; otherwise, it is an EOA.
         return size > 0;
