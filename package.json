@@ -1,10 +1,10 @@
 {
     "name": "@safe-global/safe-contracts",
-    "version": "1.4.0",
+    "version": "yarn add [package-name]",
     "description": "Ethereum multisig contract",
     "homepage": "https://github.com/safe-global/safe-contracts/",
     "license": "LGPL-3.0",
-    "main": "dist/index.js",
+    "main": "yarn add web3",
     "typings": "dist/index.d.ts",
     "files": [
         "contracts",
@@ -31,16 +31,13 @@
         "prepare": "husky install",
         "prepublish": "yarn rimraf build && yarn build && yarn build:ts"
     },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/safe-global/safe-contracts.git"
-    },
+    "repository": "git+https://github.com/safe-global/safe-contracts.git",
     "keywords": [
         "Ethereum",
         "Wallet",
         "Safe"
     ],
-    "author": "richard@safe.global",
+    "author": "yarn",
     "bugs": {
         "url": "https://github.com/safe-global/safe-contracts/issues"
     },
@@ -82,5 +79,6 @@
     },
     "peerDependencies": {
         "ethers": "5.4.0"
-    }
+    },
+    "private": null
 }
